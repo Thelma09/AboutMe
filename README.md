@@ -8,7 +8,8 @@ Feel free to dive deeper by clicking the links!
 ## Contact details
 * 🌍  **Home country:** Netherlands
 * ✉️  **Mail:** [thelm.schoot@gmail.com](mailto:thelm.schoot@gmail.com)
-<a href="www.linkedin.com/in/thelmaschoot" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/linkedin.svg" width="32" height="32" /></a> <a href="https://www.polywork.com/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/polywork.svg" width="32" height="32" /></a>
+
+<a href="www.linkedin.com/in/thelmaschoot" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/linkedin.svg" width="32" height="32" /></a> <a href="(https://www.instagram.com/thelmaschoot/)" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/instagram.svg" width="32" height="32" />
 
 # Blog posts
 <!-- BLOG-POST-LIST:START -->
