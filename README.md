@@ -1,0 +1,21 @@
+HI, IAM PACHI :D
+
+* 🌍  I'm based in somewhere in BRASIL
+* ✉️  You can contact me at [pachicodes@gmail.com](mailto:pachicodes@gmail.com)
+
+<a href="https://www.twitter.com/pachicodes" target="_blank" rel="noreferrer"><img
+src="https://img.shields.io/twitter/follow/pachicodes?logo=twitter&style=for-the-badge&color=0891b2&labelColor=1c1917"
+/></a>
+
+### Socials
+
+<p align="left"> <a href="https://www.dev.to/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/devdotto.svg" width="32" height="32" /></a> <a href="https://www.github.com/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/github.svg" width="32" height="32" /></a> <a href="http://www.instagram.com/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/instagram.svg" width="32" height="32" /></a> <a href="https://www.linkedin.com/in/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/linkedin.svg" width="32" height="32" /></a> <a href="https://www.polywork.com/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/polywork.svg" width="32" height="32" /></a> <a href="https://www.twitter.com/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/twitter.svg" width="32" height="32" /></a> <a href="https://www.youtube.com/c/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/youtube.svg" width="32" height="32" /></a> <a href="https://www.twitch.tv/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/twitch.svg" width="32" height="32" /></a></p>
+
+# Blog posts
+<!-- BLOG-POST-LIST:START -->
+- [3 Competências essenciais para programar com IA em 2026](https://dev.to/pachicodes/3-competencias-essenciais-para-programar-com-ia-em-2026-2156)
+- [🚀 Novidades GitHub Universe 2025](https://dev.to/pachicodes/novidades-github-universe-2025-30mo)
+- [Oi :3](https://dev.to/pachicodes/oi-3-4ikf)
+- [O Que É DevRel? Entenda Developer Relations no Brasil](https://dev.to/abacatedevrel/o-que-e-devrel-entenda-developer-relations-no-brasil-45i4)
+- [O Valor de uma Comunidade: Seis pilares tangíveis para o crescimento da sua empresa](https://dev.to/abacatedevrel/o-valor-de-uma-comunidade-seis-pilares-tangiveis-para-o-crescimento-da-sua-empresa-3i4g)
+<!-- BLOG-POST-LIST:END -->
