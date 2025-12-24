@@ -1,15 +1,14 @@
-HI, IAM PACHI :D
+# BSc - Thelma Schoot
 
-* 🌍  I'm based in somewhere in BRASIL
-* ✉️  You can contact me at [pachicodes@gmail.com](mailto:pachicodes@gmail.com)
+I've recently graduated with honor from Forensic Science at the Amsterdam University of Applied Sciences.
+This page serves as an online portfolio regarding my experiences and competences.
 
-<a href="https://www.twitter.com/pachicodes" target="_blank" rel="noreferrer"><img
-src="https://img.shields.io/twitter/follow/pachicodes?logo=twitter&style=for-the-badge&color=0891b2&labelColor=1c1917"
-/></a>
+Feel free to dive deeper by clicking the links!
 
-### Socials
-
-<p align="left"> <a href="https://www.dev.to/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/devdotto.svg" width="32" height="32" /></a> <a href="https://www.github.com/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/github.svg" width="32" height="32" /></a> <a href="http://www.instagram.com/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/instagram.svg" width="32" height="32" /></a> <a href="https://www.linkedin.com/in/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/linkedin.svg" width="32" height="32" /></a> <a href="https://www.polywork.com/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/polywork.svg" width="32" height="32" /></a> <a href="https://www.twitter.com/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/twitter.svg" width="32" height="32" /></a> <a href="https://www.youtube.com/c/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/youtube.svg" width="32" height="32" /></a> <a href="https://www.twitch.tv/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/twitch.svg" width="32" height="32" /></a></p>
+## Contact details
+* 🌍  **Home country:** Netherlands
+* ✉️  **Mail:** [thelm.schoot@gmail.com](mailto:thelm.schoot@gmail.com)
+<a href="www.linkedin.com/in/thelmaschoot" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/linkedin.svg" width="32" height="32" /></a> <a href="https://www.polywork.com/pachicodes" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/socials/polywork.svg" width="32" height="32" /></a>
 
 # Blog posts
 <!-- BLOG-POST-LIST:START -->
