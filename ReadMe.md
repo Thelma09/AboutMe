@@ -3,7 +3,9 @@
 I've recently graduated with honor from Forensic Science at the Amsterdam University of Applied Sciences.
 This page serves as an online portfolio regarding my experiences and competences.
 
-Feel free to dive deeper by clicking the links!
+Feel free to dive deeper by clicking the links!<b/>
+
+<a href="Projects.md" target="_blank">Visit W3Schools!</a>
 
 ## Contact details
 * 🌍  **Home country:** Netherlands
