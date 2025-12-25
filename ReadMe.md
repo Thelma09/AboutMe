@@ -5,7 +5,7 @@ This page serves as an online portfolio regarding my experiences and competences
 
 Feel free to dive deeper by clicking the links!<b/>
 
-<a href="Projects.md" target="_blank">Visit W3Schools!</a>
+<a href="Projects.md" target="_blank">Projects contributed</a>
 
 ## Contact details
 * 🌍  **Home country:** Netherlands
