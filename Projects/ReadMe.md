@@ -20,7 +20,9 @@ _Accomplishments:_
 
 <br/>
 
-_Links to examples:_
+_Sections of the script:_
+
+
 
 ### Data2Activity
 _Time period:_ 08/2024 to 01/2025
