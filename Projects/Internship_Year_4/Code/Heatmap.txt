@@ -1,0 +1,217 @@
+*This code was used to create the heatmap showcasting the likelihood ratio's of the origin of the questioned imagery*
+*This code was partially written with the aid of generative AI*
+
+def createDF_ConfusionMatrix(df_input, output_folder):
+#1. create dataframe with every correlationvalue
+    df_input = pd.read_csv(df_input)
+
+    # Compute the result dictionary
+    result = {}
+    for _, row in df_input.iterrows():
+        if 'Flat' in str(row[7]):
+            original_pattern = str(row[1])
+            reference_pattern = str(row[7])
+            reference_device = str(row[5])
+            original_device = str(row[3])
+            x = float(row[2])
+            LR = calculate_LR(kde_formulafolder, x, reference_device, original_device)
+            if original_pattern not in result:
+                result[original_pattern] = {}
+            result[original_pattern][reference_pattern] = LR
+
+    # Convert to DataFrame
+    df_CM = pd.DataFrame.from_dict(result, orient='index').sort_index(axis=0).sort_index(axis=1)
+    df_CM = df_CM.reset_index().rename({'index': 'Daderpatroon'}, axis=1)
+
+    # --- CUSTOM SORTING ---
+
+    device_order = {
+        3: 99,   
+        10: 98,  
+        2: 2,    
+        4: 1,    
+        7: 7,    
+        11: 6,   
+        5: 3,
+        6: 4,    
+        12: 5    
+        
+    }
+
+
+    # Custom row (original pattern) ordering
+    def row_sort_key(pattern):
+        import re
+        match = re.match(r" Dader_(\d+)_stand(\d+)-Device(\d+)_.*", pattern)
+        if match:
+            dader_num = int(match.group(1))
+            stand_num = int(match.group(2))
+            device_num = int(match.group(3))
+            device_order_val = device_order.get(device_num, device_num)
+            return (dader_num, stand_num, device_order_val)
+        else:
+            return (999, 999, 999)
+
+    # Sort rows
+    df_CM = df_CM.set_index('Daderpatroon')
+    df_CM = df_CM.loc[sorted(df_CM.index, key=row_sort_key)]
+
+    # Custom column (reference pattern) ordering
+    def col_sort_key(pattern):
+        import re
+        match = re.match(r"Flat_Night_(\d+)-Device(\d+)_.*", pattern)
+        if match:
+            night_num = int(match.group(1))
+            device_num = int(match.group(2))
+            device_order_val = device_order.get(device_num, device_num)
+            return (night_num, device_order_val)
+        else:
+            return (999, 999)
+
+    df_CM = df_CM[sorted(df_CM.columns, key=col_sort_key)]
+    df_CM = df_CM.reset_index()  # optional, bring 'Daderpatroon' back as column
+
+    print(df_CM)
+    #2. create image out of dataframe
+    match_color ='green'
+    mismatch_color = 'red'
+    row_labels_full = df_CM.iloc[:, 0]
+    row_labels = row_labels_full.apply(lambda x: '-'.join(str(x).split('-')[1:]))
+    row_groups = row_labels_full.apply(lambda x: str(x).split('-')[0])
+    col_labels_full = df_CM.columns[1:]
+    col_labels = col_labels_full.map(lambda x: '-'.join(str(x).split('-')[1:]))
+    col_groups = col_labels_full.map(lambda x: str(x).split('-')[0])
+    data = df_CM.iloc[:, 1:].apply(pd.to_numeric, errors='coerce')
+    data.fillna(0, inplace=True)
+    max_val = np.abs(data.values).max()
+    print("Max absolute value in data:", max_val)
+    rgba_array = np.empty(data.shape + (4,), dtype=float)
+
+    # function rename labels
+    def rename_labels(label):
+        label = str(label).strip()
+        parts = label.split("_")
+        if len(parts) >= 3:
+            brand = parts[-2]   # second to last
+            model = parts[-1]   # last
+        else:
+            return label
+    
+        if "Apple" in brand:
+            if model == 'iPhone15Plus44':
+                model = 'iPhone15Plus'
+            model = re.sub(r'(iPhone)(15|16)', r'\1 \2 ', model)
+            model = model.strip()
+        elif 'Samsung' in brand:
+            model = model[:7] + " " + model[7:11] + " " + model[11:]
+        elif 'Nova' in model or 'Reno' in model:
+            model = model[:4] + " " + model[4:]
+            if 'Reno' in model:
+                model = model[:7] + " " + model[7:]
+        elif 'P30' in model:
+            model = model[:3] + " " + model[3:]
+        elif 'Google' in brand:
+            model = model[:5] + " " + model[5:6] + " " + model[6:9] + " XL"
+        label = f'{brand} {model}'
+        return label
+
+    # function 'waarschijnlijkheidstermen'
+    def get_intensity(val):
+        if np.isinf(val):
+            return 1.0
+        elif val >= 1000000:
+            return 1.0
+        elif val >= 10000:
+            return 0.9
+        elif val >= 1000:
+            return 0.75
+        elif val >= 100:
+            return 0.6
+        elif val >= 10:
+            return 0.4
+        elif val >= 2:
+            return 0.25
+        elif val >= 1:
+            return 0.1
+        else:
+            return 0.05
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            val = data.iat[i, j]
+            intensity = get_intensity(val)
+            match = row_labels.iat[i] == col_labels[j]
+            base_color = to_rgba(match_color if match else mismatch_color)
+            rgba_array[i, j] = base_color[:3] + (intensity, )
+    #3. plot dataframe
+    plt.figure(figsize=(18, 45))
+    plt.imshow(rgba_array, aspect='auto')
+    ax = plt.gca()
+    # Minor ticks for grid
+    ax.set_xticks(np.arange(data.shape[1]+1)-0.5, minor=True)
+    ax.set_yticks(np.arange(data.shape[0]+1)-0.5, minor=True)
+    ax.grid(which="minor", color="black", linestyle='-', linewidth=0.5)
+    ax.tick_params(which="minor", bottom=False, left=False)
+
+    col_labels_named = list(map(rename_labels, col_labels))
+    row_labels_named = list(map(rename_labels, row_labels))
+
+    # Major ticks (inside heatmap)
+    ax.set_xticks(np.arange(data.shape[1]))
+    ax.set_yticks(np.arange(data.shape[0]))
+    ax.set_xticklabels(col_labels_named, rotation=90, ha='center')
+    ax.set_yticklabels(row_labels_named, va='center')
+    # Column and row labels inside the heatmap
+    ax.tick_params(axis='x', labeltop=False, labelbottom=True)
+    ax.tick_params(axis='y', labelleft=True, labelright=False)
+    # Title
+    plt.title("LR-based heatmap", pad=20)
+    # Legend
+    green_patch = mpatches.Patch(color='green', label='Match')
+    red_patch = mpatches.Patch(color='red', label='Mismatch')
+    plt.legend(handles=[green_patch, red_patch], loc='upper left')
+    # Column labels (below x-as)
+    col_group_positions = {}
+    for i, group in enumerate(col_groups):
+        col_group_positions.setdefault(group, []).append(i)
+    for group, positions in col_group_positions.items():
+        num_part = re.search(r'\d+$', group).group()
+        group = f"Flatfield {num_part}"
+        start = positions[0]
+        end = positions[-1]
+        mid = (start + end) / 2
+        label_y_pos = data.shape[0] + 8
+        box_height = 6
+        box_width = end - start + 1
+        # Draw white rectangle (background label)
+        rect = patches.Rectangle((start - 0.5, label_y_pos - box_height / 2), box_width, box_height, linewidth=0, edgecolor='none',
+        facecolor='white', transform=ax.transData, clip_on=False, zorder=1)
+        ax.add_patch(rect)
+        # Draw the label on top of white box
+        ax.text(mid, label_y_pos, group, ha='center', va='center', fontsize=9, fontweight='bold', rotation=90, transform=ax.transData, clip_on=False, zorder=2)
+        # Column group border
+        rect = patches.Rectangle((start - 0.5, -0.5), end - start + 1, data.shape[0], linewidth=1.5, edgecolor='black', facecolor='none')
+        ax.add_patch(rect)
+    # Row labels (left y-as)
+    row_group_positions = {}
+    for i, group in enumerate(row_groups):
+        row_group_positions.setdefault(group, []).append(i)
+    for group, positions in row_group_positions.items():
+        num_part = re.search(r'_(\d+)_', group).group(1)
+        position = re.search(r'(\d+)$', group).group(1)
+        group = f"Questioned Image {num_part}\nPosition {position}"
+        start = positions[0]
+        end = positions[-1]
+        mid = (start + end) / 2
+        ax.text(-7.5, mid, group, ha='right', va='center', fontsize=9, fontweight='bold', transform=ax.transData, clip_on=False)
+        # Row group border
+        rect = patches.Rectangle((-0.5, start - 0.5), data.shape[1], end -
+        start + 1,
+        linewidth=1.5, edgecolor='black',
+        facecolor='none')
+        ax.add_patch(rect)
+    plt.tight_layout()
+    plot_path = os.path.join(output_folder, "HeatmapLR's.png")
+    plt.savefig(plot_path)
+    plt.show()
+    plt.close()
+    return df_CM
