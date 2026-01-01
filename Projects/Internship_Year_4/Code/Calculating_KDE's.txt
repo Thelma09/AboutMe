@@ -1,0 +1,69 @@
+*This code was used to automatically calculate the kernel density estimations of the match and mismatch comparisons for each device*
+
+def KDE_per_device(input_file, output_folder):
+    df_input = pd.read_csv(input_file)
+
+    match_devices = [col.replace("match_", "") for col in df_input.columns if col.startswith("match_")]
+    mismatch_devices = [col.replace("mismatch_", "") for col in df_input.columns if col.startswith("mismatch_")]
+    common_devices = set(match_devices) & set(mismatch_devices)
+
+    os.makedirs(output_folder, exist_ok=True)
+    KDE_folder = os.path.join(output_folder, "KDE_formulas")
+    os.makedirs(KDE_folder, exist_ok=True)
+
+    for device in common_devices:
+        match_col = f"match_{device}"
+        mismatch_col = f"mismatch_{device}"
+        match_values = df_input[match_col].dropna()
+        mismatch_values = df_input[mismatch_col].dropna()
+
+        if len(match_values) == 0 or len(mismatch_values) == 0:
+            print(f"[Warning] No data for {device}, skipping KDE")
+            continue
+
+        kde_match = gaussian_kde(match_values, bw_method='scott')
+        kde_mismatch = gaussian_kde(mismatch_values, bw_method='scott')
+
+        # save KDE objects
+        joblib.dump(kde_match, os.path.join(KDE_folder, f'{device}_kde_match.pkl'))
+        joblib.dump(kde_mismatch, os.path.join(KDE_folder, f'{device}_kde_mismatch.pkl'))
+
+        # plot and save
+        data_min = min(match_values.min(), mismatch_values.min())
+        data_max = max(match_values.max(), mismatch_values.max())
+        range_buffer = 0.1 * (data_max - data_min)
+        x_range = np.linspace(data_min - range_buffer, data_max + range_buffer, 200)
+
+        plt.figure(figsize=(8, 4))
+        plt.plot(x_range, kde_match(x_range), label='Match', color='blue')
+        plt.plot(x_range, kde_mismatch(x_range), label='Mismatch', color='red')
+        p, brand, model = device.split("_")
+        if "Apple" in brand:
+            if model == 'iPhone15Plus44':
+                model = 'iPhone15Plus'
+            model = re.sub(r'(iPhone)(15|16)', r'\1 \2 ', model)
+            model = model.strip()
+        elif 'Samsung' in brand:
+            model = model[:7] + " " + model[7:11] + " " + model[11:]
+        elif 'Nova' in model or 'Reno' in model:
+            model = model[:4] + " " + model[4:]
+            if 'Reno' in model:
+                model = model[:7] + " " + model[7:]
+        elif 'P30' in model:
+            model = model[:3] + " " + model[3:]
+        elif 'Google' in brand:
+            model = model[:5] + " " + model[5:6] + " " + model[6:9] + " XL"
+        plt.title(f'KDE: {brand} {model}')
+        plt.xlabel('Cross-correlation value')
+        plt.ylabel('Density')
+        plt.grid(True)
+        plt.legend()
+        plt.xlim(data_min - range_buffer, data_max + range_buffer)
+        plt.tight_layout()
+
+        plot_path = os.path.join(output_folder, f'kde_{device}.png')
+        plt.savefig(plot_path)
+        plt.close()
+output_folder_KDE = os.path.join(outputmap, "KDE_plots")
+combined_csv = os.path.join(outputmap, "Combined_Correlationvalues_per_Device.csv")
+KDE_per_device(combined_csv, output_folder_KDE)
