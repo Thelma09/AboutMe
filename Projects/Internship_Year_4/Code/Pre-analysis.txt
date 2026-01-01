@@ -1,0 +1,217 @@
+*This code was used to prep the data before the analysis cound take place. The direct pathnames have been anonymized*
+
+matchmap = "..............."
+mismatchmap ="..........."
+dadermap = "................"
+outputmap = ".............."
+def reading_map(path_map):
+    bestandenmap = glob.glob(os.path.join(path_map, "*.csv"))
+    return bestandenmap
+matchbestanden = reading_map(matchmap)
+mismatchbestanden = reading_map(mismatchmap)
+daderbestanden = reading_map(dadermap)
+def combine_files(bestanden):
+    li = []
+    for filename in bestanden:
+        df = pd.read_csv(filename, index_col=None, header=0)
+        li.append(df)
+    combined_df = pd.concat(li, axis=0, ignore_index=True)
+    combined_df = combined_df.applymap(lambda x: x.replace("GalaxyZFoipd6","GalaxyZFlip6") if isinstance(x, str) else x)
+    return combined_df
+df_matches = combine_files(matchbestanden)
+df_mismatches = combine_files(mismatchbestanden)
+df_daders = combine_files(daderbestanden)
+print(df_matches)
+def extract_device_name(text):
+    match = re.search(r'\((.*?)\)', str(text))
+    return match.group(1) if match else None
+def converting_df(df):
+    df[['Images', 'Correlation']] = df.iloc[:, 0].str.split(";", expand=True)
+    df['Correlation'] = pd.to_numeric(df['Correlation'], errors='coerce')
+    df['Device'] = df['Images'].apply(extract_device_name)
+    return df
+def extract_devices_from_row(row):
+    match = re.findall(r'\(([^)]+)\)', str(row))
+    if len(match) == 2:
+        return pd.Series([match[0].strip(), match[1].strip()])
+    elif len(match) == 1:
+        return pd.Series([match[0].strip(), None])
+    else:
+        return pd.Series([None, None])
+def extract_brand(device_string):
+    if device_string is None:
+        return None
+    parts = device_string.split("_")
+    return parts[1] if len(parts) >= 2 else None
+def prepare_mismatches(df):
+    df[['Images', 'Correlation']] = df.iloc[:, 0].str.split(";", expand=True)
+    df['Correlation'] = pd.to_numeric(df['Correlation'], errors='coerce')
+    df[['Device_A', 'Device_B']] = df['Images'].apply(extract_devices_from_row)
+    df['Brand_A'] = df['Device_A'].apply(extract_brand)
+    df['Brand_B'] = df['Device_B'].apply(extract_brand)
+    return df
+def same_brand_df():
+    converted_df_mismatches = prepare_mismatches(df_mismatches)
+    same_brand_mismatches = converted_df_mismatches[converted_df_mismatches['Brand_A'] == converted_df_mismatches['Brand_B']]
+    same_brand_stats = same_brand_mismatches.groupby('Device_A')['Correlation'].agg(
+        mismatch_min_samebrand='min',
+        mismatch_max_samebrand='max').reset_index()
+    print(same_brand_stats)
+converted_df_mismatches = prepare_mismatches(df_mismatches)
+def make_output(df, filename):
+    output_directory = "..................."
+    output_path = os.path.join(output_directory, filename)
+    os.makedirs(output_directory, exist_ok=True)
+    df.to_csv(output_path, index=False)
+def apply_device_name(row, previous_device):
+    if 'Comparing' in row['Images']:
+        return row['Device']
+    else:
+        return previous_device
+def recreate_excel(df_input):
+    df_input = converting_df(df_input)
+    previous_device = None
+    device_names = []
+    for index, row in df_input.iterrows():
+        current_device = apply_device_name(row, previous_device)
+        device_names.append(current_device)
+        previous_device = current_device
+    df_input['Device_Name'] = device_names
+    df_input['Original_Image'] = df_input['Images'].str.extract(r'^(.*?)\s*\(').fillna(
+    df_input['Images'].str.extract(r'^([^;]+)'))
+    df_input = df_input.iloc[:, 2:]
+    if 'Device' in df_input.columns:
+        df_input = df_input.rename(columns={'Device': 'Device_nr2'})
+    if 'Device_Name' in df_input.columns:
+        df_input = df_input.rename(columns={'Device_Name': 'Device_nr1'})
+        df_input = df_input.drop(columns=[col for col in ['Device_A', 'Device_B']
+    if col in df_input.columns])
+        df_input['Brand_1'] = df_input['Device_nr1'].apply(extract_brand)
+        df_input['Brand_2'] = df_input['Device_nr2'].apply(extract_brand)
+        column_order = ['Original_Image', 'Images', 'Correlation', 'Device_nr1',
+        'Brand_1', 'Device_nr2', 'Brand_2']
+        df_input = df_input[[col for col in column_order if col in
+        df_input.columns]]
+    print(df_input.head())
+    return df_input
+cleaned_df_mismatches = recreate_excel(df_mismatches)
+cleaned_df_matches = recreate_excel(df_matches)
+cleaned_df_daders = recreate_excel(df_daders)
+make_output(cleaned_df_mismatches, "cleaned_mismatches.csv")
+make_output(cleaned_df_matches, "cleaned_matches.csv")
+make_output(cleaned_df_daders, "cleaned_daderexcel.csv")
+def rename_device09_daders(input_file):
+    df_input = input_file
+    for index, row in df_input.iterrows():
+        for col in df_input.columns:
+            if isinstance(row[col], str) and "Device09_Huawei_NovaP30Lite" in row[col]:
+                df_input.at[index, col] = row[col].replace(
+                "Device09_Huawei_NovaP30Lite", "Device09_Huawei_P30Lite")
+    return df_input
+cleaned_df_daders2 = rename_device09_daders(cleaned_df_daders)
+make_output(cleaned_df_daders2, "cleaned_daderexcel.csv")
+def add_pattern_columns(df_input):
+    df_input = pd.read_csv(df_input)
+    #1. Combining the name of the original pattern with it's original device
+    df_input[['Original_image', 'Original_pattern']] = df_input.iloc[:,
+    0].str.split(':', expand = True)
+    df_input.loc[df_input[df_input.columns[7]].astype(str).str.contains('Dader', na=False), df_input.columns[7]] = (
+        df_input[df_input.columns[7]].astype(str) + '-' +
+        df_input[df_input.columns[2]].astype(str)
+        )
+    column_order = ['Original_Image', 'Original_pattern', 'Correlation',
+        'Device_nr1', 'Brand_1', 'Device_nr2', 'Brand_2']
+    df_input = df_input[[col for col in column_order if col in
+    df_input.columns]]
+    #2. Copying original frame
+    df_input[df_input.columns[1]] = df_input[[df_input.columns[1]]].fillna(method='ffill')
+    #3. Create reference frame column
+    df_input[['Reference_pattern', 'Extra']] = df_input.iloc[:, 0].str.split(':', expand = True)
+    df_input.loc[df_input[df_input.columns[7]].astype(str).str.contains('Flat', na=False), df_input.columns[7]] = (
+        df_input[df_input.columns[7]].astype(str) + '-' + 
+        df_input[df_input.columns[5]].astype(str)
+        )
+    column_order = ['Original_Image', 'Original_pattern', 'Correlation',
+        'Device_nr1', 'Brand_1', 'Device_nr2', 'Brand_2', 'Reference_pattern']
+    df_input = df_input[[col for col in column_order if col in
+    df_input.columns]]
+    print(df_input)
+    return df_input
+df_cleaned_daders = "......."
+df_dader_original_frame = add_pattern_columns(df_cleaned_daders)
+make_output(df_dader_original_frame, "cleaned_daderexcel.csv")
+def create_merged_df():
+    converted_df_matches = cleaned_df_matches
+    device_stats_matches = converted_df_matches.groupby('Device_nr1')['Correlation'].agg(['min',
+        'max']).reset_index()
+    device_stats_matches = device_stats_matches.rename(columns={
+        'min': 'match_min',
+        'max': 'match_max'
+        })
+    converted_df_mismatches = cleaned_df_mismatches
+    device_stats_mismatches = converted_df_mismatches.groupby('Device_nr1')['Correlation'].agg(['min',
+        'max']).reset_index()
+    device_stats_mismatches = device_stats_mismatches.rename(columns={
+        'min': 'mismatch_min',
+        'max': 'mismatch_max'
+        })
+    df_temp = cleaned_df_mismatches.copy()
+    same_brand_mismatches = df_temp[df_temp['Brand_1'] == df_temp['Brand_2']]
+    same_brand_stats_A = same_brand_mismatches[['Device_nr1', 'Correlation']].rename(columns={'Device_nr1': 'Device_nr1'})
+    same_brand_stats_B = same_brand_mismatches[['Device_nr2', 'Correlation']].rename(columns={'Device_nr2': 'Device_nr2'})
+    same_brand_stats_all = pd.concat([same_brand_stats_A, same_brand_stats_B])
+    same_brand_stats = same_brand_stats_all.groupby('Device_nr1')['Correlation'].agg(
+        mismatch_min_samebrand='min',
+        mismatch_max_samebrand='max'
+        ).reset_index()
+    diff_brand_mismatches = df_temp[df_temp['Brand_1'] != df_temp['Brand_2']]
+    diff_brand_stats_A = diff_brand_mismatches[['Device_nr1', 'Correlation']].rename(columns={'Device_nr1': 'Device_nr1'})
+    diff_brand_stats_B = diff_brand_mismatches[['Device_nr2', 'Correlation']].rename(columns={'Device_nr2': 'Device_nr2'})
+    diff_brand_stats_all = pd.concat([diff_brand_stats_A, diff_brand_stats_B])
+    diff_brand_stats = diff_brand_stats_all.groupby('Device_nr1')['Correlation'].agg(
+        mismatch_min_diffbrand='min',
+        mismatch_max_diffbrand='max'
+        ).reset_index()
+    combined_stats = pd.merge(device_stats_matches, device_stats_mismatches, on='Device_nr1', how='outer')
+    combined_stats = pd.merge(combined_stats, same_brand_stats, on='Device_nr1', how='left')
+    combined_stats = pd.merge(combined_stats, diff_brand_stats, on='Device_nr1', how='left')
+    combined_stats = combined_stats.sort_values(by='Device_nr1').reset_index(drop=True)
+    combined_stats = combined_stats.rename(columns={'Device_nr1': 'Device'})
+    print(combined_stats)
+    return combined_stats
+combined_stats = create_merged_df()
+make_output(combined_stats, "combined_stats.csv")
+def create_combined_csv(file_match, file02):
+    #1. combining match-values per device
+    df_match = pd.read_csv(file_match, header=None)
+    device_column = df_match.iloc[1:, 2].values
+    value_column = df_match.iloc[1:, 1].values
+    df = pd.DataFrame({'device': device_column,
+        'value': pd.to_numeric(value_column, errors='coerce')
+        })
+    df['row_index'] = df.groupby('device').cumcount()
+    df_pivot = df.pivot(index='row_index', columns='device', values='value')
+    df_pivot = df_pivot.reset_index(drop=True)
+    df_pivot = df_pivot.dropna()
+    df_pivot.columns = ['match_' + str(col) for col in df_pivot.columns]
+    print(df_pivot)
+    #2. combining mismatch-values per device
+    df_mm = pd.read_csv(file02, header=None)
+    mm_device_column = df_mm.iloc[1:, 2]
+    mm_value_column = pd.to_numeric(df_mm.iloc[1:, 1], errors='coerce')
+    df_02 = pd.DataFrame({
+        'device': mm_device_column,
+        'value': mm_value_column
+        })
+    df_02['row_index'] = df_02.groupby('device').cumcount()
+    df_pivot02 = df_02.pivot(index='row_index', columns='device', values='value')
+    df_pivot02 = df_pivot02.reset_index(drop=True).dropna()
+    df_pivot02.columns = ['mismatch_' + str(col) for col in df_pivot02.columns]
+    print(df_pivot02)
+    #3. Combine values into one dataframe
+    df_full = df_pivot02.join(df_pivot)
+    print(df_full)
+    make_output(df_full, "Combined_Correlationvalues_per_Device.csv")
+file_match = os.path.join(outputmap, "cleaned_matches.csv")
+file02 = os.path.join(outputmap, "cleaned_mismatches.csv")
+create_combined_csv(file_match, file02)
