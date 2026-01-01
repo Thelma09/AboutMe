@@ -1,0 +1,41 @@
+*This code was used to automatically calculate the Likelihood Ratio's for each device*
+
+def calculate_LR(kde_folder, x, reference_device, original_device):
+
+    match_kdes = {}
+    mismatch_kdes = {}
+
+    for filename in os.listdir(kde_folder):
+        if not filename.endswith(".pkl"):
+            continue
+
+        filepath = os.path.join(kde_folder, filename)
+        if '_kde_match.pkl' in filename:
+            device = filename.replace('_kde_match.pkl', '')
+            match_kdes[device] = joblib.load(filepath)
+        elif '_kde_mismatch.pkl' in filename:
+            device = filename.replace('_kde_mismatch.pkl', '')
+            mismatch_kdes[device] = joblib.load(filepath)
+
+    x = np.array([x])
+    match_kde = match_kdes.get(reference_device)
+    mismatch_kde = mismatch_kdes.get(reference_device)
+    if match_kde is None or mismatch_kde is None:
+        print(f"KDE not found for {reference_device}")
+        return 0
+
+    match_density = match_kde(x)[0]
+    mismatch_density = mismatch_kde(x)[0]
+    with np.errstate(divide='ignore', invalid='ignore'):
+        try:
+            LR = match_density / mismatch_density
+            if np.isinf(LR):
+                print(f"[Warning] Infinite LR for: {reference_device}, {original_device} "
+                      f"(match={match_density}, mismatch={mismatch_density}, x={x[0]})")
+            elif np.isnan(LR):
+                print(f"[Warning] NaN LR for: {reference_device} "
+                      f"(match={match_density}, mismatch={mismatch_density}, x={x[0]})")
+        except ZeroDivisionError:
+            print(f"[Error] Division by zero for {reference_device}, x = {x[0]}")
+            return 0
+    return LR
