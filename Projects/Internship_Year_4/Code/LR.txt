@@ -1,4 +1,4 @@
-*This code was used to automatically calculate the Likelihood Ratio's for each device*
+*This code was used to automatically calculate the likelihood ratio's for each device as the origin of the questioned imagery*
 
 def calculate_LR(kde_folder, x, reference_device, original_device):
 
