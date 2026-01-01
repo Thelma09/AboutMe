@@ -21,7 +21,7 @@ _Accomplishments:_
 <br/>
 
 _Sections of the script:_
-
+<a href="Projects/Internship_Year_4/Code/KDE's.txt" target="_blank">Calculation of kernal density estimations</a>, <a href="Projects/Internship_Year_4/Code/LR.txt" target="_blank">Calculation of likelihood ratio's</a>, <a href="Projects/Internship_Year_4/Code/Heatmap.txt" target="_blank">Generating heatmap</a> 
 
 
 ### Data2Activity
