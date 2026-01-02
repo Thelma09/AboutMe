@@ -5,6 +5,11 @@
 ### Graduation product (year 4)
 _Time period:_ 02/2025 to 07/2025<br/>
 _Commissioning company:_ Netherlands Forensic Institute
+<br/>
+<br/>
+_Description:_ This internship consisted of work on two different topics:
+* Profieciency test: Creating a feedback report according to the 'framework of the conduct of proficiency tests within ENFSI': containing the variety in results, methods and conclusions of different accredited organizations for determining the provenance of images from smartphones released past the conduct of the last proficiency test.
+* Experiment: Determining the influence of 'night mode'/'night sight' on the PRNU-pattern in images obtained from smartphones released past the year 2018
 
 <br/>
 
@@ -26,6 +31,7 @@ _Sections of the script:_
 
 ### Data2Activity
 _Time period:_ 08/2024 to 01/2025
+_Commissioning company:_ Netherlands Forensic Institute
 
 <br/>
 
@@ -34,8 +40,8 @@ _Accomplishments:_
 
 <br/>
 
-_Links to examples:_
-
+_Clarification:_
+Please read the article '<a href="https://doi.org/10.1016/j.scijus.2023.04.002" target="_blank">Digital traces and physical activities: opportunities, challenges and pitfalls</a>' for a more detailed description of the project.
 
 ### Internship (year 3)
 _Time period:_ 09/2023 to 01/2024
